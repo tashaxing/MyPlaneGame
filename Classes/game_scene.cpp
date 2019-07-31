@@ -17,7 +17,11 @@ bool GameScene::init()
     
     CCLOG("game init");
     
-    // init sky background and rotate moving
+    // 初始化天空背景并循环移动
+    
+    // 初始化玩家飞机
+    
+    // 初始化敌机
     
     // 添加触摸事件监听
     auto touch_listener = EventListenerTouchOneByOne::create();
@@ -26,6 +30,7 @@ bool GameScene::init()
     touch_listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touch_listener, this);
     
+    // 默认渲染更新
     scheduleUpdate();
     
     return true;
