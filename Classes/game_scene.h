@@ -26,13 +26,13 @@ public:
     CREATE_FUNC(GameScene);
     
 private:
-    void generateBullet();
-    void generateWeapon();
-    void generateEnemy();
+    void onGenerateBullet();
+    void onGenerateWeapon();
+    void onGenerateEnemy();
     
-    Vector<Bullet*> m_bullets; // 飞行中的子弹
-    Vector<Enemy*> m_enemies; // 天空中的道具
-    Vector<Weapon*> m_weapons; // 存活的敌机
+    cocos2d::Vector<Bullet*> m_bullets; // 飞行中的子弹
+    cocos2d::Vector<Enemy*> m_enemies; // 天空中的道具
+    cocos2d::Vector<Weapon*> m_weapons; // 存活的敌机
 };
 
 #endif /* __GAME_SCENE_H__ */

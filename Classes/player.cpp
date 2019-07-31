@@ -11,4 +11,8 @@ bool Player::init()
     return true;
 }
 
+void Player::die()
+{
+    
+}
 

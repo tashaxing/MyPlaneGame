@@ -21,7 +21,11 @@ bool GameScene::init()
     
     // 初始化玩家飞机
     
-    // 初始化敌机
+    // 初始化敌机，调度敌机
+    
+    // 初始化道具，调度道具
+    
+    // 定时器触发调度飞机射击子弹
     
     // 添加触摸事件监听
     auto touch_listener = EventListenerTouchOneByOne::create();
