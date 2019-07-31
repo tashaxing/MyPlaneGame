@@ -53,6 +53,11 @@
 		D6B0611B1803AB670077942B /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6B0611A1803AB670077942B /* CoreMotion.framework */; };
 		E23ECE8022F07A2C006CE7FA /* main_menu_scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E23ECE7E22F07A2C006CE7FA /* main_menu_scene.cpp */; };
 		E23ECE8322F07C1F006CE7FA /* game_scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E23ECE8222F07C1F006CE7FA /* game_scene.cpp */; };
+		E23ECE8622F1C604006CE7FA /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E23ECE8422F1C604006CE7FA /* player.cpp */; };
+		E23ECE8A22F1C973006CE7FA /* enemy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E23ECE8922F1C973006CE7FA /* enemy.cpp */; };
+		E23ECE8D22F1CF77006CE7FA /* bullet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E23ECE8C22F1CF77006CE7FA /* bullet.cpp */; };
+		E23ECE9022F1D091006CE7FA /* weapon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E23ECE8F22F1D091006CE7FA /* weapon.cpp */; };
+		E23ECE9322F1D4C3006CE7FA /* sky_background.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E23ECE9222F1D4C3006CE7FA /* sky_background.cpp */; };
 		ED545A7C1B68A1F400C3958E /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ED545A7B1B68A1F400C3958E /* libiconv.dylib */; };
 		ED545A7E1B68A1FA00C3958E /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ED545A7D1B68A1FA00C3958E /* libiconv.dylib */; };
 /* End PBXBuildFile section */
@@ -142,6 +147,16 @@
 		E23ECE7F22F07A2C006CE7FA /* main_menu_scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main_menu_scene.h; sourceTree = "<group>"; };
 		E23ECE8122F07BE3006CE7FA /* game_scene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = game_scene.h; sourceTree = "<group>"; };
 		E23ECE8222F07C1F006CE7FA /* game_scene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game_scene.cpp; sourceTree = "<group>"; };
+		E23ECE8422F1C604006CE7FA /* player.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = player.cpp; sourceTree = "<group>"; };
+		E23ECE8722F1C63A006CE7FA /* player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = player.h; sourceTree = "<group>"; };
+		E23ECE8822F1C7F4006CE7FA /* enemy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = enemy.h; sourceTree = "<group>"; };
+		E23ECE8922F1C973006CE7FA /* enemy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = enemy.cpp; sourceTree = "<group>"; };
+		E23ECE8B22F1CEF7006CE7FA /* bullet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bullet.h; sourceTree = "<group>"; };
+		E23ECE8C22F1CF77006CE7FA /* bullet.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bullet.cpp; sourceTree = "<group>"; };
+		E23ECE8E22F1D080006CE7FA /* weapon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = weapon.h; sourceTree = "<group>"; };
+		E23ECE8F22F1D091006CE7FA /* weapon.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = weapon.cpp; sourceTree = "<group>"; };
+		E23ECE9122F1D4AE006CE7FA /* sky_background.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sky_background.h; sourceTree = "<group>"; };
+		E23ECE9222F1D4C3006CE7FA /* sky_background.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sky_background.cpp; sourceTree = "<group>"; };
 		ED545A7B1B68A1F400C3958E /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
 		ED545A7D1B68A1FA00C3958E /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -283,12 +298,22 @@
 		46880B8319C43A87006E1F66 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				E23ECE7E22F07A2C006CE7FA /* main_menu_scene.cpp */,
-				E23ECE7F22F07A2C006CE7FA /* main_menu_scene.h */,
-				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
+				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
+				E23ECE7F22F07A2C006CE7FA /* main_menu_scene.h */,
+				E23ECE7E22F07A2C006CE7FA /* main_menu_scene.cpp */,
 				E23ECE8122F07BE3006CE7FA /* game_scene.h */,
 				E23ECE8222F07C1F006CE7FA /* game_scene.cpp */,
+				E23ECE8722F1C63A006CE7FA /* player.h */,
+				E23ECE8422F1C604006CE7FA /* player.cpp */,
+				E23ECE8822F1C7F4006CE7FA /* enemy.h */,
+				E23ECE8922F1C973006CE7FA /* enemy.cpp */,
+				E23ECE8B22F1CEF7006CE7FA /* bullet.h */,
+				E23ECE8C22F1CF77006CE7FA /* bullet.cpp */,
+				E23ECE8E22F1D080006CE7FA /* weapon.h */,
+				E23ECE8F22F1D091006CE7FA /* weapon.cpp */,
+				E23ECE9122F1D4AE006CE7FA /* sky_background.h */,
+				E23ECE9222F1D4C3006CE7FA /* sky_background.cpp */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -447,12 +472,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E23ECE8A22F1C973006CE7FA /* enemy.cpp in Sources */,
+				E23ECE9322F1D4C3006CE7FA /* sky_background.cpp in Sources */,
+				E23ECE8D22F1CF77006CE7FA /* bullet.cpp in Sources */,
 				E23ECE8322F07C1F006CE7FA /* game_scene.cpp in Sources */,
 				1AF87B781F6F77F7007BE51C /* AppController.mm in Sources */,
 				1AF87B8B1F6F782A007BE51C /* RootViewController.mm in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				E23ECE8022F07A2C006CE7FA /* main_menu_scene.cpp in Sources */,
 				1AF87B8A1F6F7822007BE51C /* main.m in Sources */,
+				E23ECE8622F1C604006CE7FA /* player.cpp in Sources */,
+				E23ECE9022F1D091006CE7FA /* weapon.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
