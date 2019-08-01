@@ -5,7 +5,10 @@
 
 class Weapon : public cocos2d::Sprite
 {
+public:
+    virtual bool init();
     
+    CREATE_FUNC(Weapon);
 };
 
 #endif /* __WEAPON_H__ */

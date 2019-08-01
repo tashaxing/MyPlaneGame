@@ -5,7 +5,14 @@
 
 class Bullet : public cocos2d::Sprite
 {
+public:
+    virtual bool init();
     
+    CREATE_FUNC(Bullet);
+    
+public:
+    void move();
+    int m_speed;
 };
 
 #endif /* __BULLET_H__ */
