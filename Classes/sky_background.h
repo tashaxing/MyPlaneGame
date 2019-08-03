@@ -5,7 +5,14 @@
 
 class SkyBackground : public cocos2d::Node
 {
+public:
+    virtual bool init();
+    CREATE_FUNC(SkyBackground);
     
+private:
+    void backgroundRotate(float tm);
+    cocos2d::Sprite* m_background1;
+    cocos2d::Sprite* m_background2;
 };
 
 #endif /* __SKY_BACKGROUND_H__ */

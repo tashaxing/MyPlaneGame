@@ -2,6 +2,7 @@
 #define __GAME_SCENE_H__
 
 #include "cocos2d.h"
+#include "sky_background.h"
 #include "player.h"
 #include "bullet.h"
 #include "weapon.h"
@@ -30,6 +31,8 @@ private:
     void onGenerateWeapon(float interval); // 固定时间间隔产生道具
     void onGenerateEnemy(float interval); // 固定时间间隔出现敌机
     
+    SkyBackground* m_sky_background; // 天空背景
+    Player* m_player; // 玩家飞机
     cocos2d::Vector<Bullet*> m_bullets; // 飞行中的子弹
     cocos2d::Vector<Enemy*> m_enemies; // 天空中的道具
     cocos2d::Vector<Weapon*> m_weapons; // 存活的敌机
