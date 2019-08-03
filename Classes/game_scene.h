@@ -26,9 +26,9 @@ public:
     CREATE_FUNC(GameScene);
     
 private:
-    void onGenerateBullet();
-    void onGenerateWeapon();
-    void onGenerateEnemy();
+    void onGenerateBullet(float interval); // 固定时间间隔发射子弹
+    void onGenerateWeapon(float interval); // 固定时间间隔产生道具
+    void onGenerateEnemy(float interval); // 固定时间间隔出现敌机
     
     cocos2d::Vector<Bullet*> m_bullets; // 飞行中的子弹
     cocos2d::Vector<Enemy*> m_enemies; // 天空中的道具
