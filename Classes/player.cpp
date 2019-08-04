@@ -4,6 +4,8 @@
 USING_NS_CC;
 using namespace CocosDenshion;
 
+const float kPowerTime = 3.0;
+
 bool Player::init()
 {
     if (!Sprite::init())
@@ -39,7 +41,7 @@ bool Player::init()
 Bullet* Player::shootSingle()
 {
     // 发射子弹音效
-//    SimpleAudioEngine::getInstance()->playEffect("sound/bullet.wav");
+    SimpleAudioEngine::getInstance()->playEffect("sound/bullet.wav");
     
     // 子弹从飞机头部打出来
     Bullet* bullet = Bullet::create();
@@ -51,7 +53,7 @@ Bullet* Player::shootSingle()
 Vector<Bullet*> Player::shootDouble()
 {
     // 发射子弹音效
-//    SimpleAudioEngine::getInstance()->playEffect("sound/bullet.wav");
+    SimpleAudioEngine::getInstance()->playEffect("sound/bullet.wav");
     
     Vector<Bullet*> double_bullets;
     // 子弹都从飞机头部打出来,左右两个子弹分布在机头
@@ -66,6 +68,30 @@ Vector<Bullet*> Player::shootDouble()
     double_bullets.pushBack(bullet_right);
     
     return double_bullets;
+}
+
+void Player::fetchWeapon(WeaponType weapon_type)
+{
+    // 如果道具是子弹,且之前是单子弹，切换子弹,并持续一段时间
+    if (m_bullet_type == BulletType::BASE && weapon_type == WeaponType::AMMO)
+    {
+        m_bullet_type = BulletType::POWER;
+        // 播放音效
+        SimpleAudioEngine::getInstance()->playEffect("sound/get_double_laser.wav");
+        
+        // 用lambda做单次定时器回调
+        scheduleOnce([&](float delay){
+            m_bullet_type = BulletType::BASE;
+            SimpleAudioEngine::getInstance()->playEffect("sound/out_porp.wav");
+        }, kPowerTime, "power_status");
+    }
+    else if (weapon_type == WeaponType::BOMB)
+    {
+        // 播放音效
+        SimpleAudioEngine::getInstance()->playEffect("sound/get_bomb");
+        
+        // TODO: 储存炸弹
+    }
 }
 
 void Player::destroy()

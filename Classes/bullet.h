@@ -5,8 +5,8 @@
 
 enum BulletType
 {
-    BASE,
-    POWER
+    BASE, // 单子弹
+    POWER // 双子单
 };
 
 class Bullet : public cocos2d::Sprite
@@ -17,8 +17,11 @@ public:
     CREATE_FUNC(Bullet);
     
 public:
+    int m_kill_hp; // 子弹的杀伤力
+    
+private:
     void move(float tm);
-    int m_speed;
+    float m_speed;
 };
 
 #endif /* __BULLET_H__ */

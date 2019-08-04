@@ -5,9 +5,9 @@
 
 enum EnemyType
 {
-    SMALL,
-    MEDIUM,
-    BIG
+    SMALL,  // 小飞机
+    MEDIUM, // 中等飞机
+    BIG     // 大飞船
 };
 
 class Enemy : public cocos2d::Sprite
@@ -18,9 +18,15 @@ public:
     CREATE_FUNC(Enemy);
     
     void initWithType(EnemyType enemy_type);
-    void die();
+    void fly(float tm);
+    void hit(int reduce_hp); // 敌机被子弹打中
+    void die(); // 敌机死亡
     
-    int m_speed;
+    int m_hp; // 敌机总血量
+    
+private:
+    EnemyType m_type;
+    float m_speed;
 };
 
 #endif /* __ENEMY_H__ */

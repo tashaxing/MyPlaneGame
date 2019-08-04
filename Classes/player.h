@@ -15,8 +15,8 @@ public:
 public:
     Bullet* shootSingle(); // 射击一次，产生一颗子弹
     cocos2d::Vector<Bullet*> shootDouble(); // 射击一次，产生双子弹
-    void getWeapon(int weapon_type);
-    void destroy();
+    void fetchWeapon(WeaponType weapon_type); // 拾取道具
+    void destroy(); // 玩家over
     
     BulletType m_bullet_type; // 根据子弹类型改变子弹
 };
