@@ -23,7 +23,7 @@ bool SkyBackground::init()
     addChild(m_background2);
     
     // 调度两张图的移动
-    schedule(schedule_selector(SkyBackground::backgroundRotate), 0.005); // delta time smaller, move more smooth
+    schedule(schedule_selector(SkyBackground::backgroundRotate), 0.02); // delta time smaller, move more smooth
     
     return true;
 }
@@ -34,7 +34,7 @@ void SkyBackground::backgroundRotate(float tm)
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     
     // 背景2在背景1上方无缝衔接，当背景2到达底部时候，将背景1重新归位
-    m_background1->setPositionY(m_background1->getPositionY() - 0.2); // rotate speed
+    m_background1->setPositionY(m_background1->getPositionY() - 0.5); // rotate speed
     m_background2->setPositionY(m_background1->getPositionY() + visible_size.height);
     if (m_background2->getPositionY() <= visible_origin.y)
         m_background1->setPositionY(visible_origin.y);
