@@ -98,5 +98,19 @@ void Player::destroy()
 {
     // 被摧毁音效
     SimpleAudioEngine::getInstance()->playEffect("sound/game_over.wav");
+    
+    // 被摧毁动画
+    Animation* animation = Animation::create();
+    
+    for (int i = 1; i <= 4; i++)
+    {
+        std::string player_frame_name = "img/hero_blowup_n" + std::to_string(i) + ".png";
+        animation->addSpriteFrameWithFile(player_frame_name);
+    }
+//    animation->setRestoreOriginalFrame(false); // 默认播放动画结束后不恢复到第一帧
+    animation->setDelayPerUnit(0.2);
+    
+    Animate* animate = Animate::create(animation);
+    runAction(animate);
 }
 

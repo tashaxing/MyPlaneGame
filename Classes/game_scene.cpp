@@ -30,6 +30,9 @@ bool GameScene::init()
     Size visible_size = Director::getInstance()->getVisibleSize();
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     
+    // 初始化游戏状态
+    m_is_over = false;
+    
     // 初始化天空背景并循环移动
     m_sky_background = SkyBackground::create();
     addChild(m_sky_background, kBackgroundZorder);
@@ -83,40 +86,75 @@ void GameScene::update(float dt)
 {
     // NOTICE: dt is normally 0.0167, so other timer may not be faster than this
     //    CCLOG("update delta: %f", dt);
- 
+    
+    // 游戏结束后避免出现空指针内存错误
+    if (m_is_over)
+        return;
+    
     Size visible_size = Director::getInstance()->getVisibleSize();
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     
     // --- 碰撞监测 ---
+    // 判断玩家
+    for (Enemy* enemy : m_enemies)
+    {
+        if (enemy->m_hp > 0 && enemy->getBoundingBox().intersectsRect(m_player->getBoundingBox()))
+        {
+            // 玩家飞机撞了，游戏结束
+            m_is_over = true;
+            m_player->destroy();
+            scheduleOnce([&](float interval){
+                m_player->removeFromParent();
+            }, 1.0, "player destroy");
+
+            gameOver();
+            return;
+        }
+    }
+    
     // 判断敌机被子弹击中
+    Vector<Bullet*> hit_bullets;
+//    Vector<Enemy*> dead_enemies;
     for (Bullet* bullet : m_bullets)
     {
         for (Enemy* enemy : m_enemies)
         {
-            // 注意，某个子弹撞击了后要消失，并且不可在参与碰撞检测
-            if (bullet && bullet->getBoundingBox().intersectsRect(enemy->getBoundingBox()))
+            // 注意，某个子弹撞击了后要消失，并且不可再参与碰撞检测
+            if (!bullet->m_hit_flag
+                && enemy->m_hp > 0
+                && bullet->getBoundingBox().intersectsRect(enemy->getBoundingBox()))
             {
                 enemy->hit(bullet->m_kill_hp);
                 if (enemy->m_hp <= 0)
                 {
                     enemy->die();
-                    
-                    // 延迟一会儿放完动画再清除
-//                    scheduleOnce([&](float interval){
-//                        m_enemies.eraseObject(enemy);
-//                        enemy->removeFromParent();
-//                    }, 1.0, "enemy down");
+                    m_enemies.eraseObject(enemy);
+//                    dead_enemies.pushBack(enemy);
                     
                     // TODO: 更新分数
                 }
                 
-                // 移除子弹
-                m_bullets.eraseObject(bullet);
-                bullet->removeFromParent();
-                bullet = nullptr; // FIXME: mark as cannot be checked
+                // 移除子弹, 先标记起来放到移除列表
+                bullet->m_hit_flag = true;
+                hit_bullets.pushBack(bullet);
             }
         }
+        
+//        for (Enemy* enemy : dead_enemies)
+//        {
+//            CCLOG("remove enemy");
+//            m_enemies.eraseObject(enemy);
+//            enemy->removeFromParent();
+//        }
+//        dead_enemies.clear();
     }
+    // 这里统一移除
+    for (Bullet* bullet : hit_bullets)
+    {
+        m_bullets.eraseObject(bullet);
+        bullet->removeFromParent();
+    }
+    hit_bullets.clear();
     
     // 判断拾取道具
     for (Weapon* weapon : m_weapons)
@@ -131,7 +169,7 @@ void GameScene::update(float dt)
                 SimpleAudioEngine::getInstance()->playEffect("sound/use_bomb.wav");
                 for (Enemy* enemy : m_enemies)
                 {
-                    enemy->m_hp = 0;
+                    enemy->m_hp = 0; // 先把血量置空
                     enemy->die();
                     
                     // 延迟一会儿放完动画再清除
@@ -188,6 +226,9 @@ void GameScene::update(float dt)
 
 bool GameScene::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event)
 {
+    if (m_is_over)
+        return true;
+    
     CCLOG("onTouchBegan");
     m_pretouch_pos = touch->getLocation();
     m_preplayer_pos = m_player->getPosition();
@@ -197,6 +238,8 @@ bool GameScene::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event)
 
 void GameScene::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *event)
 {
+    if (m_is_over)
+        return;
     CCLOG("onTouchMoved");
     Point current_touch_pos = touch->getLocation();
     Vec2 move_delta = current_touch_pos - m_pretouch_pos;
@@ -205,12 +248,18 @@ void GameScene::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *event)
 
 void GameScene::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event)
 {
+    if (m_is_over)
+        return;
+    
     CCLOG("onTouchEnded");
     m_pretouch_pos = kInitPoint;
 }
 
 void GameScene::generateBullet(float interval)
 {
+    if (m_is_over)
+        return;
+    
     // 由定时器触发产生子弹，也可以由某个按键触发
     // 根据玩家子弹状态产生不同的子弹，加到场景和管理器
     if (m_player->m_bullet_type == BulletType::BASE)
@@ -232,6 +281,9 @@ void GameScene::generateBullet(float interval)
 
 void GameScene::generateEnemy(float interval)
 {
+    if (m_is_over)
+        return;
+    
     Size visible_size = Director::getInstance()->getVisibleSize();
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     
@@ -261,6 +313,9 @@ void GameScene::generateEnemy(float interval)
 
 void GameScene::generateWeapon(float interval)
 {
+    if (m_is_over)
+        return;
+    
     Size visible_size = Director::getInstance()->getVisibleSize();
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     
@@ -284,4 +339,17 @@ void GameScene::generateWeapon(float interval)
     
     addChild(weapon, kWeaponZorder);
     m_weapons.pushBack(weapon);
+}
+
+void GameScene::gameOver()
+{
+    CCLOG("player hit, game over");
+    
+    // 暂停所有的调度器
+    unschedule(schedule_selector(GameScene::generateEnemy));
+    unschedule(schedule_selector(GameScene::generateWeapon));
+    unschedule(schedule_selector(GameScene::generateBullet));
+    
+    // 加菜单
+    
 }

@@ -127,7 +127,9 @@ void Enemy::die()
     animation->setDelayPerUnit(0.1);
     
     Animate* animate = Animate::create(animation);
-    runAction(animate);
+    runAction(Sequence::create(animate, CallFunc::create([&](){
+        removeFromParent();
+    }), NULL));
     
     // TODO: clean up and callback
 }

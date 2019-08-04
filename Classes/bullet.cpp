@@ -18,6 +18,9 @@ bool Bullet::init()
 
 void Bullet::initWithType(BulletType bullet_type)
 {
+    // 初始子弹未击中
+    m_hit_flag = false;
+    
     // 设置纹理和子弹速度
     if (bullet_type == BulletType::BASE)
     {

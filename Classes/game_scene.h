@@ -27,6 +27,9 @@ public:
     CREATE_FUNC(GameScene);
     
 private:
+    void gameOver();
+    bool m_is_over;
+    
     void generateBullet(float interval); // 固定时间间隔发射子弹
     void generateWeapon(float interval); // 固定时间间隔产生道具
     void generateEnemy(float interval); // 固定时间间隔出现敌机

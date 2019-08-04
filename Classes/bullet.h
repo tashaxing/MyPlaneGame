@@ -18,6 +18,7 @@ public:
     
 public:
     int m_kill_hp; // 子弹的杀伤力
+    bool m_hit_flag; // 标记子弹是否已击中
     
 private:
     void move(float tm);
