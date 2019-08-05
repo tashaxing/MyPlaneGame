@@ -29,6 +29,7 @@ public:
 private:
 	void getScore(EnemyType enemy_type);
 	int m_score; // 游戏分数
+	cocos2d::Sprite* m_score_label; // 分数UI
     void gameOver(); // 游戏结束，处理后续
     bool m_is_over; // 游戏结束标志
     

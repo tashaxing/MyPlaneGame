@@ -41,7 +41,8 @@ bool GameScene::init()
 	
 	// 初始化游戏分数
 	m_score = 0;
-    
+	//m_score_label
+
     // 初始化天空背景并循环移动
     m_sky_background = SkyBackground::create();
     addChild(m_sky_background, kBackgroundZorder);
@@ -110,6 +111,10 @@ void GameScene::getScore(EnemyType enemy_type)
 	}
 
 	CCLOG("score = %d", m_score);
+
+	// 如果分数达到一定阶段，播放成就音效
+	if (m_score > 0 && m_score % kAchievementScoreUnit == 0)
+		SimpleAudioEngine::getInstance()->playEffect("img/achievement.wav");
 
 	// TODO: 刷新UI
 }
@@ -368,6 +373,6 @@ void GameScene::gameOver()
     unschedule(schedule_selector(GameScene::generateWeapon));
     unschedule(schedule_selector(GameScene::generateBullet));
     
-    // 加菜单
+    // TODO: 切换到菜单场景
     
 }
