@@ -96,6 +96,14 @@ void Enemy::hit(int reduce_hp)
 
 void Enemy::die()
 {
+    // 摧毁音效
+    if (m_type == EnemyType::SMALL)
+        SimpleAudioEngine::getInstance()->playEffect("sound/enemy1_down.wav");
+    else if (m_type == EnemyType::MEDIUM)
+        SimpleAudioEngine::getInstance()->playEffect("sound/enemy2_down.wav");
+    if (m_type == EnemyType::BIG)
+        SimpleAudioEngine::getInstance()->playEffect("sound/enemy3_down.wav");
+    
     // 播放爆炸动画
     Animation* animation = Animation::create();
     

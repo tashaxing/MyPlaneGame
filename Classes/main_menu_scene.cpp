@@ -1,7 +1,9 @@
 #include "main_menu_scene.h"
 #include "SimpleAudioEngine.h"
+#include "ui/CocosGUI.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
 
 Scene* MainMenuScene::createScene()
 {
@@ -18,52 +20,27 @@ bool MainMenuScene::init()
         return false;
     }
 
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    auto visible_size = Director::getInstance()->getVisibleSize();
+    auto visible_origin = Director::getInstance()->getVisibleOrigin();
 
-	// TODO: add background and menu
+	// 添加背景图
+    Sprite* background = Sprite::create("img/background.png");
+    background->setContentSize(visible_size);
+    background->setPosition(visible_origin.x + visible_size.width / 2,
+                            visible_origin.y + visible_size.height / 2);
+    addChild(background);
+    
+    Sprite* title = Sprite::create("img/title.png");
+    title->setScale(1.5); // 尺寸适当调整
+    title->setPosition(visible_origin.x + visible_size.width / 2,
+                            visible_origin.y + visible_size.height * 2 / 3);
+    addChild(title);
 
-    ///////////////////////////////
-    //// 2. add a menu item with "X" image, which is clicked to quit the program
-    ////    you may modify it.
-
-    //// add a "close" icon to exit the progress. it's an autorelease object
-    //
-
-    ///////////////////////////////
-    //// 3. add your codes below...
-
-    //// add a label shows "Hello World"
-    //// create and initialize a label
-
-    //auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    //if (label == nullptr)
-    //{
-    //    problemLoading("'fonts/Marker Felt.ttf'");
-    //}
-    //else
-    //{
-    //    // position the label on the center of the screen
-    //    label->setPosition(Vec2(origin.x + visibleSize.width/2,
-    //                            origin.y + visibleSize.height - label->getContentSize().height));
-
-    //    // add the label as a child to this layer
-    //    this->addChild(label, 1);
-    //}
-
-    //// add "HelloWorld" splash screen"
-    //auto sprite = Sprite::create("HelloWorld.png");
-    //if (sprite == nullptr)
-    //{
-    //    problemLoading("'HelloWorld.png'");
-    //}
-    //else
-    //{
-    //    // position the sprite on the center of the screen
-    //    sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-
-    //    // add the sprite as a child to this layer
-    //    this->addChild(sprite, 0);
-    //}
+    // 添加按钮
+    Button* start_btn = Button::create("img/game_resume_nor.png", "img/game_resume_pressed.png", "img/game_resume_nor.png");
+    start_btn->setPosition(visible_origin.x + visible_size.width / 2,
+                           visible_origin.y + visible_size.height / 2);
+    addChild(start_btn);
+    
     return true;
 }
