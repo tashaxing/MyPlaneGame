@@ -128,9 +128,8 @@ void Enemy::die()
     
     Animate* animate = Animate::create(animation);
     runAction(Sequence::create(animate, CallFunc::create([&](){
+		// 动画放完回调里面清除该对象
         removeFromParent();
     }), NULL));
-    
-    // TODO: clean up and callback
 }
 

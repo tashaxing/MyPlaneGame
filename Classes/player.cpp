@@ -111,6 +111,9 @@ void Player::destroy()
     animation->setDelayPerUnit(0.2);
     
     Animate* animate = Animate::create(animation);
-    runAction(animate);
+	runAction(Sequence::create(animate, CallFunc::create([&]() {
+		// 动画放完回调里面清除该对象
+		removeFromParent();
+		}), NULL));
 }
 

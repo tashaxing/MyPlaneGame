@@ -27,8 +27,10 @@ public:
     CREATE_FUNC(GameScene);
     
 private:
-    void gameOver();
-    bool m_is_over;
+	void getScore(EnemyType enemy_type);
+	int m_score; // 游戏分数
+    void gameOver(); // 游戏结束，处理后续
+    bool m_is_over; // 游戏结束标志
     
     void generateBullet(float interval); // 固定时间间隔发射子弹
     void generateWeapon(float interval); // 固定时间间隔产生道具
@@ -36,9 +38,10 @@ private:
     
     SkyBackground* m_sky_background; // 天空背景
     Player* m_player; // 玩家飞机
-    cocos2d::Vector<Bullet*> m_bullets; // 飞行中的子弹
-    cocos2d::Vector<Enemy*> m_enemies; // 存活的敌机
-    cocos2d::Vector<Weapon*> m_weapons;// 天空中的道具
+
+    cocos2d::Vector<Bullet*> m_bullets; // 飞行中的子弹管理器
+    cocos2d::Vector<Enemy*> m_enemies; // 存活的敌机管理器
+    cocos2d::Vector<Weapon*> m_weapons;// 天空中的道具管理器
     
     cocos2d::Point m_pretouch_pos; // 保存触摸的初始点
     cocos2d::Point m_preplayer_pos; // 保存触摸时候的玩家飞机初始点

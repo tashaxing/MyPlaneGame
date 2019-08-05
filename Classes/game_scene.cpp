@@ -12,6 +12,12 @@ const float kBulletGenerateInterval = 0.2;
 const float kEnemyGenerateInterval = 1.0;
 const float kWeaponGenerateInterval = 5.0;
 
+const int kSmallPlaneScore = 100;
+const int kMediumPlaneScore = 500;
+const int kBigPlaneScore = 1000;
+
+const int kAchievementScoreUnit = 5000;
+
 const Point kInitPoint = Point(-1, -1);
 
 Scene *GameScene::createScene()
@@ -32,6 +38,9 @@ bool GameScene::init()
     
     // 初始化游戏状态
     m_is_over = false;
+	
+	// 初始化游戏分数
+	m_score = 0;
     
     // 初始化天空背景并循环移动
     m_sky_background = SkyBackground::create();
@@ -82,6 +91,29 @@ void GameScene::onExit()
     CCLOG("GameScene onExit");
 }
 
+void GameScene::getScore(EnemyType enemy_type)
+{
+	// 根据不同敌机类别得不同分数
+	switch (enemy_type)
+	{
+	case EnemyType::SMALL:
+		m_score += kSmallPlaneScore;
+		break;
+	case EnemyType::MEDIUM:
+		m_score += kMediumPlaneScore;
+		break;
+	case EnemyType::BIG:
+		m_score += kBigPlaneScore;
+		break;
+	default:
+		break;
+	}
+
+	CCLOG("score = %d", m_score);
+
+	// TODO: 刷新UI
+}
+
 void GameScene::update(float dt)
 {
     // NOTICE: dt is normally 0.0167, so other timer may not be faster than this
@@ -100,13 +132,11 @@ void GameScene::update(float dt)
     {
         if (enemy->m_hp > 0 && enemy->getBoundingBox().intersectsRect(m_player->getBoundingBox()))
         {
-            // 玩家飞机撞了，游戏结束
+            // 玩家飞机撞了
             m_is_over = true;
             m_player->destroy();
-            scheduleOnce([&](float interval){
-                m_player->removeFromParent();
-            }, 1.0, "player destroy");
 
+			// 游戏结束，处理后续
             gameOver();
             return;
         }
@@ -127,11 +157,11 @@ void GameScene::update(float dt)
                 enemy->hit(bullet->m_kill_hp);
                 if (enemy->m_hp <= 0)
                 {
-                    enemy->die();
-                    m_enemies.eraseObject(enemy);
-//                    dead_enemies.pushBack(enemy);
-                    
-                    // TODO: 更新分数
+					// 先更新分数，再移除飞机
+					getScore(enemy->m_type);
+
+                    enemy->die(); // 这里面做了对象销毁
+                    m_enemies.eraseObject(enemy); // 这里可以先于动画放完就移出管理器
                 }
                 
                 // 移除子弹, 先标记起来放到移除列表
@@ -139,16 +169,8 @@ void GameScene::update(float dt)
                 hit_bullets.pushBack(bullet);
             }
         }
-        
-//        for (Enemy* enemy : dead_enemies)
-//        {
-//            CCLOG("remove enemy");
-//            m_enemies.eraseObject(enemy);
-//            enemy->removeFromParent();
-//        }
-//        dead_enemies.clear();
     }
-    // 这里统一移除
+    // 这里统一移除子弹，避免边判断边移除导致的内存问题
     for (Bullet* bullet : hit_bullets)
     {
         m_bullets.eraseObject(bullet);
@@ -169,16 +191,12 @@ void GameScene::update(float dt)
                 SimpleAudioEngine::getInstance()->playEffect("sound/use_bomb.wav");
                 for (Enemy* enemy : m_enemies)
                 {
+					// 先更新分数，再移除飞机
+					getScore(enemy->m_type);
+
                     enemy->m_hp = 0; // 先把血量置空
-                    enemy->die();
-                    
-                    // 延迟一会儿放完动画再清除
-//                    scheduleOnce([&](float interval){
-//                        m_enemies.eraseObject(enemy);
-//                        enemy->removeFromParent();
-//                    }, 1.0, "enemy down");
-                    
-                    // TODO: 更新分数
+                    enemy->die(); // 这里面做了对象销毁
+					m_enemies.eraseObject(enemy); // 这里可以先于动画放完就移出管理器
                 }
             }
             

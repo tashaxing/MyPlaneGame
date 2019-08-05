@@ -23,9 +23,9 @@ public:
     void die(); // 敌机死亡
     
     int m_hp; // 敌机总血量
+	EnemyType m_type;
     
 private:
-    EnemyType m_type;
     float m_speed;
 };
 
