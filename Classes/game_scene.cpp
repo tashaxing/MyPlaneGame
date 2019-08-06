@@ -1,12 +1,16 @@
 #include "game_scene.h"
+#include "main_menu_scene.h"
 #include "SimpleAudioEngine.h"
+#include "ui/CocosGUI.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
+using namespace ui;
 
 const int kBackgroundZorder = 0;
 const int kBattleZorder = 1;
 const int kWeaponZorder = 2;
+const int kGameoverZorder = 3;
 
 const float kBulletGenerateInterval = 0.2;
 const float kEnemyGenerateInterval = 1.0;
@@ -38,14 +42,17 @@ bool GameScene::init()
     
     // 初始化游戏状态
     m_is_over = false;
-	
-	// 初始化游戏分数
-	m_score = 0;
-	//m_score_label
 
     // 初始化天空背景并循环移动
     m_sky_background = SkyBackground::create();
     addChild(m_sky_background, kBackgroundZorder);
+    
+    // 初始化游戏分数
+    m_score = 0;
+    m_score_label = Label::createWithTTF("score: 0", "fonts/Marker Felt.ttf", 14);
+    m_score_label->setColor(Color3B::BLACK);
+    m_score_label->setPosition(visible_origin.x + 30, visible_origin.y + visible_size.height - 20);
+    addChild(m_score_label, kBackgroundZorder);
     
     // 播放背景音乐(其实，音乐和音效最好用预先加载)
     SimpleAudioEngine::getInstance()->playBackgroundMusic("sound/game_music.wav", true); // mp3 not supported, use wav
@@ -64,6 +71,9 @@ bool GameScene::init()
     
     // 定时器触发调度飞机射击子弹
     schedule(schedule_selector(GameScene::generateBullet), kBulletGenerateInterval); // bullet interval could be adjusted
+    
+    // 添加右上角暂停和开始切换
+//    Button* start_pause_btn = Button::create("img/game_pause.png");
     
     // 添加触摸事件监听
     auto touch_listener = EventListenerTouchOneByOne::create();
@@ -95,6 +105,7 @@ void GameScene::onExit()
 void GameScene::getScore(EnemyType enemy_type)
 {
 	// 根据不同敌机类别得不同分数
+    static int phase = 0;
 	switch (enemy_type)
 	{
 	case EnemyType::SMALL:
@@ -113,10 +124,17 @@ void GameScene::getScore(EnemyType enemy_type)
 	CCLOG("score = %d", m_score);
 
 	// 如果分数达到一定阶段，播放成就音效
-	if (m_score > 0 && m_score % kAchievementScoreUnit == 0)
-		SimpleAudioEngine::getInstance()->playEffect("img/achievement.wav");
+    int new_phase = m_score / kAchievementScoreUnit;
+	if (new_phase > phase)
+    {
+        SimpleAudioEngine::getInstance()->playEffect("sound/achievement.wav");
+        phase = new_phase;
+    }
+		
 
-	// TODO: 刷新UI
+	// 刷新UI
+    m_score_label->setString(__String::createWithFormat("score: %d", m_score)->_string);
+//    m_score_label->setString(StringUtils::format("score: %d", m_score));
 }
 
 void GameScene::update(float dt)
@@ -368,11 +386,84 @@ void GameScene::gameOver()
 {
     CCLOG("player hit, game over");
     
+    Size visible_size = Director::getInstance()->getVisibleSize();
+    Point visible_origin = Director::getInstance()->getVisibleOrigin();
+    
     // 暂停所有的调度器
     unschedule(schedule_selector(GameScene::generateEnemy));
     unschedule(schedule_selector(GameScene::generateWeapon));
     unschedule(schedule_selector(GameScene::generateBullet));
     
-    // TODO: 切换到菜单场景
+    // 停止背景音乐
+    // FIXME: may cause crash
+//    if (SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying())
+//        SimpleAudioEngine::getInstance()->stopBackgroundMusic();
     
+    // TODO: 以下要延时再做
+    // 添加结束画面
+    Sprite* game_over_background = Sprite::create("img/gameover.png");
+    game_over_background->setContentSize(visible_size);
+    game_over_background->setAnchorPoint(Point::ZERO);
+    game_over_background->setPosition(visible_origin);
+    addChild(game_over_background, kGameoverZorder);
+    
+    Label* final_score_label = Label::createWithTTF(std::to_string(m_score), "fonts/Marker Felt.ttf", 14);
+    final_score_label->setColor(Color3B::BLACK);
+    final_score_label->setPosition(visible_origin.x + visible_size.width / 2,
+                               visible_origin.y + visible_size.height / 2);
+    addChild(final_score_label, kGameoverZorder);
+    
+    // 重新开始按钮
+    Button* restart_btn = Button::create("img/restart.png"); // 只添加一张背景图按钮
+    restart_btn->setScale(1.5);
+    restart_btn->setPosition(Vec2(visible_origin.x + visible_size.width / 2,
+                                  visible_origin.y + visible_size.height / 2 - 30));
+    restart_btn->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type){
+        // 按钮点击事件
+        switch (type)
+        {
+            case ui::Widget::TouchEventType::BEGAN:
+                // 播放音效
+                SimpleAudioEngine::getInstance()->playEffect("sound/button.wav");
+                break;
+            case ui::Widget::TouchEventType::ENDED:
+            {
+                // 重载主游戏场景
+                auto game_scene = GameScene::createScene();
+                TransitionScene* transition_scene = TransitionFade::create(0.5, game_scene);
+                Director::getInstance()->replaceScene(transition_scene);
+            }
+                break;
+            default:
+                break;
+        }
+    });
+    addChild(restart_btn, kGameoverZorder);
+    
+    // 结束游戏按钮
+    Button* quit_btn = Button::create("img/quit.png"); // 只添加一张背景图按钮
+    quit_btn->setScale(1.5);
+    quit_btn->setPosition(Vec2(visible_origin.x + visible_size.width / 2,
+                                  visible_origin.y + visible_size.height / 2 - 60));
+    quit_btn->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type){
+        // 按钮点击事件
+        switch (type)
+        {
+            case ui::Widget::TouchEventType::BEGAN:
+                // 播放音效
+                SimpleAudioEngine::getInstance()->playEffect("sound/button.wav");
+                break;
+            case ui::Widget::TouchEventType::ENDED:
+            {
+                // 返回到菜单场景
+                auto main_menu_scene = MainMenuScene::createScene();
+                TransitionScene* transition_scene = TransitionFade::create(0.5, main_menu_scene);
+                Director::getInstance()->replaceScene(main_menu_scene);
+            }
+                break;
+            default:
+                break;
+        }
+    });
+    addChild(quit_btn, kGameoverZorder);
 }
