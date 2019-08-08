@@ -51,7 +51,7 @@ bool GameScene::init()
     m_score = 0;
     m_score_label = Label::createWithTTF("score: 0", "fonts/Marker Felt.ttf", 14);
     m_score_label->setColor(Color3B::BLACK);
-    m_score_label->setPosition(visible_origin.x + 30, visible_origin.y + visible_size.height - 20);
+    m_score_label->setPosition(visible_origin.x + 35, visible_origin.y + visible_size.height - 20);
     addChild(m_score_label, kBackgroundZorder);
     
     // 播放背景音乐(其实，音乐和音效最好用预先加载)
@@ -121,8 +121,6 @@ void GameScene::getScore(EnemyType enemy_type)
 		break;
 	}
 
-	CCLOG("score = %d", m_score);
-
 	// 如果分数达到一定阶段，播放成就音效
     int new_phase = m_score / kAchievementScoreUnit;
 	if (new_phase > phase)
@@ -130,7 +128,6 @@ void GameScene::getScore(EnemyType enemy_type)
         SimpleAudioEngine::getInstance()->playEffect("sound/achievement.wav");
         phase = new_phase;
     }
-		
 
 	// 刷新UI
     m_score_label->setString(__String::createWithFormat("score: %d", m_score)->_string);
@@ -159,15 +156,17 @@ void GameScene::update(float dt)
             m_is_over = true;
             m_player->destroy();
 
-			// 游戏结束，处理后续
-            gameOver();
+			// 游戏结束，处理后续（延迟等到玩家飞机t摧毁动画结束）
+            scheduleOnce([&](float delay){
+                gameOver();
+            }, 2.0, "game over");
+
             return;
         }
     }
     
     // 判断敌机被子弹击中
     Vector<Bullet*> hit_bullets;
-//    Vector<Enemy*> dead_enemies;
     for (Bullet* bullet : m_bullets)
     {
         for (Enemy* enemy : m_enemies)
@@ -212,6 +211,7 @@ void GameScene::update(float dt)
             {
                 // 炸掉所有敌机
                 SimpleAudioEngine::getInstance()->playEffect("sound/use_bomb.wav");
+                CCLOG("before bomb enemy number = %d", m_enemies.size());
                 for (Enemy* enemy : m_enemies)
                 {
 					// 先更新分数，再移除飞机
@@ -219,8 +219,9 @@ void GameScene::update(float dt)
 
                     enemy->m_hp = 0; // 先把血量置空
                     enemy->die(); // 这里面做了对象销毁
-					m_enemies.eraseObject(enemy); // 这里可以先于动画放完就移出管理器
                 }
+                m_enemies.clear(); // 一定要放在这里统一清空
+                CCLOG("after bomb enemy number = %d", m_enemies.size());
             }
             
             // 道具本身也要消失
@@ -395,11 +396,10 @@ void GameScene::gameOver()
     unschedule(schedule_selector(GameScene::generateBullet));
     
     // 停止背景音乐
-    // FIXME: may cause crash
+    // FIXME: stop background music may cause crash
 //    if (SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying())
 //        SimpleAudioEngine::getInstance()->stopBackgroundMusic();
     
-    // TODO: 以下要延时再做
     // 添加结束画面
     Sprite* game_over_background = Sprite::create("img/gameover.png");
     game_over_background->setContentSize(visible_size);
