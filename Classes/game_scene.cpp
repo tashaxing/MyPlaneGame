@@ -53,7 +53,7 @@ bool GameScene::init()
     m_score_label = Label::createWithTTF("score: 0", "fonts/Marker Felt.ttf", 14);
     m_score_label->setColor(Color3B::BLACK);
     m_score_label->setPosition(visible_origin.x + 35, visible_origin.y + visible_size.height - 20);
-    addChild(m_score_label, kBackgroundZorder);
+    addChild(m_score_label, kGameoverZorder); // 分数浮层在最上方
     
     // 播放背景音乐(其实，音乐和音效最好用预先加载)
     SimpleAudioEngine::getInstance()->playBackgroundMusic("sound/game_music.wav", true); // mp3 not supported, use wav
