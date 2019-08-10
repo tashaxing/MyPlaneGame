@@ -16,9 +16,11 @@ public:
     virtual bool init();
     
     CREATE_FUNC(Enemy);
+    void pauseMove();
+    void resumeMove();
     
     void initWithType(EnemyType enemy_type);
-    void fly(float tm);
+    void move(float tm);
     void hit(int reduce_hp); // 敌机被子弹打中
     void die(); // 敌机死亡
     

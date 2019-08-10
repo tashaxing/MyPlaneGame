@@ -2,6 +2,8 @@
 
 USING_NS_CC;
 
+const float kFrameUpdateInterval = 0.02;
+
 bool SkyBackground::init()
 {
     if (!Node::init())
@@ -23,9 +25,19 @@ bool SkyBackground::init()
     addChild(m_background2);
     
     // 调度两张图的移动
-    schedule(schedule_selector(SkyBackground::backgroundRotate), 0.02); // delta time smaller, move more smooth
+    schedule(schedule_selector(SkyBackground::backgroundRotate), kFrameUpdateInterval); // delta time smaller, move more smooth
     
     return true;
+}
+
+void SkyBackground::pauseRotate()
+{
+    unschedule(schedule_selector(SkyBackground::backgroundRotate));
+}
+
+void SkyBackground::resumeRotate()
+{
+    schedule(schedule_selector(SkyBackground::backgroundRotate), kFrameUpdateInterval);
 }
 
 void SkyBackground::backgroundRotate(float tm)

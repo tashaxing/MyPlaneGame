@@ -42,6 +42,7 @@ bool GameScene::init()
     
     // 初始化游戏状态
     m_is_over = false;
+    m_is_pause = false;
 
     // 初始化天空背景并循环移动
     m_sky_background = SkyBackground::create();
@@ -73,15 +74,59 @@ bool GameScene::init()
     schedule(schedule_selector(GameScene::generateBullet), kBulletGenerateInterval); // bullet interval could be adjusted
     
     // 添加右上角暂停和开始切换
-//    Button* start_pause_btn = Button::create("img/game_pause.png");
+    Button* pause_btn = Button::create("img/game_pause_nor.png", "img/game_pause_pressed.png");
+    pause_btn->setPosition(Vec2(visible_origin.x + visible_size.width - 20,
+                                visible_origin.y + visible_size.height - 20));
+    pause_btn->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type){
+        // 按钮点击事件
+        switch (type)
+        {
+            case ui::Widget::TouchEventType::BEGAN:
+                // 播放音效
+                SimpleAudioEngine::getInstance()->playEffect("sound/button.wav");
+                break;
+            case ui::Widget::TouchEventType::ENDED:
+                // 暂停游戏
+                gamePause();
+                break;
+            default:
+                break;
+        }
+    });
+//    pause_btn->setEnabled(true);
+//    pause_btn->setVisible(true);
+    addChild(pause_btn, kGameoverZorder, "pause_btn");
+    
+    Button* resume_btn = Button::create("img/game_resume_nor.png", "img/game_resume_pressed.png");
+    resume_btn->setPosition(Vec2(visible_origin.x + visible_size.width - 20,
+                                visible_origin.y + visible_size.height - 20)); // 与暂停按钮位置重叠
+    resume_btn->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type){
+        // 按钮点击事件
+        switch (type)
+        {
+            case ui::Widget::TouchEventType::BEGAN:
+                // 播放音效
+                SimpleAudioEngine::getInstance()->playEffect("sound/button.wav");
+                break;
+            case ui::Widget::TouchEventType::ENDED:
+                // 恢复游戏
+                gameResume();
+                break;
+            default:
+                break;
+        }
+    });
+    resume_btn->setEnabled(false); // 初始不可用并隐藏
+    resume_btn->setVisible(false);
+    addChild(resume_btn, kGameoverZorder, "resume_btn");
     
     // 添加触摸事件监听
-    auto touch_listener = EventListenerTouchOneByOne::create();
-    touch_listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
-    touch_listener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
-    touch_listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(touch_listener, this);
-    
+    m_touch_listener = EventListenerTouchOneByOne::create();
+    m_touch_listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
+    m_touch_listener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMoved, this);
+    m_touch_listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(m_touch_listener, this);
+//    m_touch_listener->setEnabled(true);
     m_pretouch_pos = kInitPoint; // 未触摸时的初始点
     
     // 默认渲染更新
@@ -131,7 +176,7 @@ void GameScene::getScore(EnemyType enemy_type)
 
 	// 刷新UI
     m_score_label->setString(__String::createWithFormat("score: %d", m_score)->_string);
-//    m_score_label->setString(StringUtils::format("score: %d", m_score));
+//    m_score_label->setString(StringUtils::format("score: %d", m_score)); // the same
 }
 
 void GameScene::update(float dt)
@@ -142,6 +187,33 @@ void GameScene::update(float dt)
     // 游戏结束后避免出现空指针内存错误
     if (m_is_over)
         return;
+    
+    // 游戏暂停和恢复
+    // FIXME: every update will do this check, need to optimize
+    if (m_is_pause)
+    {
+        Button* pause_btn = (Button*)getChildByName("pause_btn");
+        pause_btn->setEnabled(false);
+        pause_btn->setVisible(false);
+        
+        Button* resume_btn = (Button*)getChildByName("resume_btn");
+        resume_btn->setEnabled(true);
+        resume_btn->setVisible(true);
+        
+        m_touch_listener->setEnabled(false); // 暂停时不可操作
+    }
+    else
+    {
+        Button* pause_btn = (Button*)getChildByName("pause_btn");
+        pause_btn->setEnabled(true);
+        pause_btn->setVisible(true);
+        
+        Button* resume_btn = (Button*)getChildByName("resume_btn");
+        resume_btn->setEnabled(false);
+        resume_btn->setVisible(false);
+        
+        m_touch_listener->setEnabled(true);
+    }
     
     Size visible_size = Director::getInstance()->getVisibleSize();
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
@@ -390,15 +462,15 @@ void GameScene::gameOver()
     Size visible_size = Director::getInstance()->getVisibleSize();
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     
-    // 暂停所有的调度器
+    // 停止背景音乐
+    // FIXME: stop background music may cause crash
+    if (SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying())
+        SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+    
+    // 停止所有的调度器
     unschedule(schedule_selector(GameScene::generateEnemy));
     unschedule(schedule_selector(GameScene::generateWeapon));
     unschedule(schedule_selector(GameScene::generateBullet));
-    
-    // 停止背景音乐
-    // FIXME: stop background music may cause crash
-//    if (SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying())
-//        SimpleAudioEngine::getInstance()->stopBackgroundMusic();
     
     // 添加结束画面
     Sprite* game_over_background = Sprite::create("img/gameover.png");
@@ -466,4 +538,50 @@ void GameScene::gameOver()
         }
     });
     addChild(quit_btn, kGameoverZorder);
+}
+
+void GameScene::gamePause()
+{
+    // 暂停背景音乐
+    SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+    
+    // 暂停游戏标志
+    m_is_pause = true;
+    
+    // 暂停所有调度器
+    unschedule(schedule_selector(GameScene::generateEnemy));
+    unschedule(schedule_selector(GameScene::generateWeapon));
+    unschedule(schedule_selector(GameScene::generateBullet));
+    
+    // 暂停所有的元素移动
+    m_sky_background->pauseRotate();
+    for (Enemy* enemy : m_enemies)
+        enemy->pauseMove();
+    for (Bullet* bullet : m_bullets)
+        bullet->pauseMove();
+    for (Weapon* weapon : m_weapons)
+        weapon->pauseMove();
+}
+
+void GameScene::gameResume()
+{
+    // 恢复背景音乐
+    SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+    
+    // 恢复游戏标志
+    m_is_pause = false;
+    
+    // 恢复所有调度器
+    schedule(schedule_selector(GameScene::generateEnemy), kEnemyGenerateInterval);
+    schedule(schedule_selector(GameScene::generateWeapon), kWeaponGenerateInterval);
+    schedule(schedule_selector(GameScene::generateBullet), kBulletGenerateInterval);
+    
+    // 恢复所有的元素移动
+    m_sky_background->resumeRotate();
+    for (Enemy* enemy : m_enemies)
+        enemy->resumeMove();
+    for (Bullet* bullet : m_bullets)
+        bullet->resumeMove();
+    for (Weapon* weapon : m_weapons)
+        weapon->resumeMove();
 }

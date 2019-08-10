@@ -12,6 +12,8 @@ const float kSpeedForSmall = 1.2;
 const float kSpeedForMedium = 0.6;
 const float kSpeedForBig = 0.3;
 
+const float kFrameUpdateInterval = 0.02;
+
 bool Enemy::init()
 {
     if (!Sprite::init())
@@ -59,10 +61,20 @@ void Enemy::initWithType(EnemyType enemy_type)
     }
     
     // 调度敌机的移动，固定间隔移动固定单位
-    schedule(schedule_selector(Enemy::fly), 0.02);
+    schedule(schedule_selector(Enemy::move), kFrameUpdateInterval);
 }
 
-void Enemy::fly(float tm)
+// FIXME: don't use pause and resume, these keywords were already used by cocos2dx
+void Enemy::pauseMove()
+{
+    unschedule(schedule_selector(Enemy::move));
+}
+void Enemy::resumeMove()
+{
+    schedule(schedule_selector(Enemy::move), kFrameUpdateInterval);
+}
+
+void Enemy::move(float tm)
 {
     setPositionY(getPositionY() - m_speed);
 }

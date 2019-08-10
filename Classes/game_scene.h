@@ -19,6 +19,7 @@ public:
     virtual void update(float dt);
     
     // 触摸事件
+    cocos2d::EventListenerTouchOneByOne* m_touch_listener;
     virtual bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
     virtual void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *event);
     virtual void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
@@ -32,6 +33,9 @@ private:
 	cocos2d::Label* m_score_label; // 分数UI
     void gameOver(); // 游戏结束，处理后续
     bool m_is_over; // 游戏结束标志
+    void gamePause(); // 游戏aa暂停
+    void gameResume(); // 游戏恢复
+    bool m_is_pause; // 游戏暂停标志
     
     void generateBullet(float interval); // 固定时间间隔发射子弹
     void generateWeapon(float interval); // 固定时间间隔产生道具

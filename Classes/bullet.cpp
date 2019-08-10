@@ -8,6 +8,8 @@ const float kHighSpeed = 5.0;
 const int kLowKillHp = 10;
 const int kHighKillHp = 20;
 
+const float kFrameUpdateInterval = 0.02;
+
 bool Bullet::init()
 {
     if (!Sprite::init())
@@ -36,7 +38,17 @@ void Bullet::initWithType(BulletType bullet_type)
     }
     
     // 调度子弹的移动，固定间隔移动固定单位
-    schedule(schedule_selector(Bullet::move), 0.02);
+    schedule(schedule_selector(Bullet::move), kFrameUpdateInterval);
+}
+
+void Bullet::pauseMove()
+{
+    unschedule(schedule_selector(Bullet::move));
+}
+
+void Bullet::resumeMove()
+{
+    schedule(schedule_selector(Bullet::move), kFrameUpdateInterval);
 }
 
 void Bullet::move(float tm)

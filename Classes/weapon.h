@@ -15,8 +15,9 @@ public:
     virtual bool init();
     
     CREATE_FUNC(Weapon);
-    
     void initWithType(WeaponType weapon_type);
+    void pauseMove();
+    void resumeMove();
     
     WeaponType m_type;
     

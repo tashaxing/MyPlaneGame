@@ -8,6 +8,8 @@ class SkyBackground : public cocos2d::Node
 public:
     virtual bool init();
     CREATE_FUNC(SkyBackground);
+    void pauseRotate();
+    void resumeRotate();
     
 private:
     void backgroundRotate(float tm);

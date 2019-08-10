@@ -4,7 +4,7 @@
 USING_NS_CC;
 using namespace CocosDenshion;
 
-const float kPowerTime = 3.0;
+const float kPowerTime = 8.0;
 
 bool Player::init()
 {
@@ -79,7 +79,7 @@ void Player::fetchWeapon(WeaponType weapon_type)
         // 播放音效
         SimpleAudioEngine::getInstance()->playEffect("sound/get_double_laser.wav");
         
-        // 用lambda做单次定时器回调
+        // 子弹有效时间，用lambda做单次定时器回调
         scheduleOnce([&](float delay){
             m_bullet_type = BulletType::BASE;
             SimpleAudioEngine::getInstance()->playEffect("sound/out_porp.wav");

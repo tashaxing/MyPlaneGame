@@ -15,6 +15,8 @@ public:
     virtual bool init();
     void initWithType(BulletType bullet_type); // 根据子弹类型设置纹理
     CREATE_FUNC(Bullet);
+    void pauseMove();
+    void resumeMove();
     
 public:
     int m_kill_hp; // 子弹的杀伤力
